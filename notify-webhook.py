@@ -107,7 +107,7 @@ if REPO_OWNER_NAME is None or REPO_OWNER_EMAIL is None:
     if REPO_OWNER_EMAIL is None:
         REPO_OWNER_EMAIL = email
 
-def get_revisions(old, new, head_commit=False):
+def get_revisions(old, new):
     if re.match("^0+$", old):
         commit_range = '%s..%s' % (EMPTY_TREE_HASH, new)
     else:
@@ -172,9 +172,6 @@ def get_revisions(old, new, head_commit=False):
             props['name'] = 'unknown'
             props['email'] = 'unknown'
         del props['author']
-
-        if head_commit:
-            return props
 
         revisions.append(props)
         s += 2
@@ -261,7 +258,7 @@ def make_json(old, new, ref):
                         })
     data['commits'] = commits
     data['size'] = len(commits)
-    data['head_commit'] = get_revisions(old, new, True)
+    data['head_commit'] = commits[0]
 
     base_ref = get_base_ref(new, ref)
     if base_ref:
