@@ -125,7 +125,13 @@ def get_revisions(old, new):
         props = {'id': lines[0].strip().split(' ')[1], 'added': [], 'removed': [], 'modified': []}
 
         # call git diff-tree and get the file changes
-        output = git(['diff-tree', '-r', '-C', '%s' % props['id']])
+        if (s == len(sections) - 2) and re.match("^0+$", old): # First ever commit needs to be compared
+                                                               # to empty tree hash or else shows nothing 
+            diff_range = "%s..%s" % (EMPTY_TREE_HASH, props['id'])
+        else: # Regular commits on the other hand show diff by simply using their own hash
+        	diff_range = props['id']
+
+        output = git(['diff-tree', '-r', '-C', '%s' % diff_range])
 
         # sort the changes into the added/modified/removed lists
         for i in DIFF_TREE_RE.finditer(output):
